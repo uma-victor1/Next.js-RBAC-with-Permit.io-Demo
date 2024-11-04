@@ -10,7 +10,7 @@ import { getUser } from '@/app/auth/03-dal';
 const navLinks = [
   { title: 'Home', href: '/dashboard', badge: 0 },
   { title: 'Orders', href: '#', badge: 3 },
-  { title: 'Products', href: '#', badge: 0 },
+  { title: 'Products', href: '/dashboard/products', badge: 0 },
   { title: 'Customers', href: '#', badge: 0 },
   { title: 'Analytics', href: '#', badge: 0 },
 ];
@@ -21,7 +21,7 @@ export default async function Layout({
   children: React.ReactNode;
 }) {
   const user = await getUser();
-  console.log(user);
+  console.log(user, 'user');
 
   const activeLink = '/dashboard';
 

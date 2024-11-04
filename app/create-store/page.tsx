@@ -21,6 +21,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/app/hooks/use-toast';
+import { getUser } from '../lib/user';
 
 const formSchema = z.object({
   storeName: z.string().min(2, {
@@ -40,17 +41,18 @@ export default function CreateStore() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    const user = await getUser();
+
     try {
       setIsSubmitting(true);
       const store: StoreType = {
         name: values.storeName,
         description: values.description,
-        ownerId: 0,
+        ownerId: user?.id as number,
       };
 
-      createStoreAction(store);
+      await createStoreAction(store);
 
-      console.log(values);
       toast({
         title: 'Store created successfully!',
         description: 'Your new store has been set up.',
