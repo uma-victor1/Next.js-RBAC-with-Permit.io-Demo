@@ -43,6 +43,7 @@ export const products = pgTable('products', {
     .references(() => stores.id),
   name: varchar('name', { length: 255 }).notNull(),
   description: text('description').notNull(),
+  quantity: integer('quantity').notNull(),
   price: integer('price').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),

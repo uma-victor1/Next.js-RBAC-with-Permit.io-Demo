@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import Image from 'next/image';
 import Link from 'next/link';
 import { getUser } from '@/app/auth/03-dal';
+import { Toaster } from '@/components/ui/toaster';
 
 const navLinks = [
   { title: 'Home', href: '/dashboard', badge: 0 },
@@ -99,6 +100,7 @@ export default async function Layout({
           </div>
         </header>
         <main className="flex-1 p-4 md:p-6">{children}</main>
+        <Toaster />
       </div>
     </div>
   );

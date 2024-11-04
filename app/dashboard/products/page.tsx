@@ -1,8 +1,5 @@
-'use client';
-
-import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import StoreItemForm from './StoreItemForm';
 import {
   Table,
   TableBody,
@@ -12,44 +9,22 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { Plus, Trash2 } from 'lucide-react';
+import DeleteItemButton from './DeleteItemButton';
 
-interface InventoryItem {
-  id: number;
-  name: string;
-  price: number;
-  quantity: number;
+async function fetchInventory() {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/getStoreItems`,
+    { cache: 'no-store' },
+  );
+  if (!res.ok) throw new Error('Failed to fetch inventory');
+
+  return res.json();
 }
 
-export default function InventoryPage() {
-  const [inventory, setInventory] = useState<InventoryItem[]>([]);
-  const [newItem, setNewItem] = useState({ name: '', price: '', quantity: '' });
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setNewItem((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (newItem.name && newItem.price && newItem.quantity) {
-      setInventory((prev) => [
-        ...prev,
-        {
-          id: Date.now(),
-          name: newItem.name,
-          price: parseFloat(newItem.price),
-          quantity: parseInt(newItem.quantity, 10),
-        },
-      ]);
-      setNewItem({ name: '', price: '', quantity: '' });
-    }
-  };
-
-  const handleDelete = (id: number) => {
-    setInventory((prev) => prev.filter((item) => item.id !== id));
-  };
+export default async function InventoryPage() {
+  const inventory = await fetchInventory();
+  console.log(inventory, 'inventory');
+  console.log('gcdgcjud');
 
   return (
     <div className="container mx-auto p-4">
@@ -60,49 +35,7 @@ export default function InventoryPage() {
           <CardTitle>Add New Item</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-              <div className="space-y-2">
-                <Label htmlFor="name">Item Name</Label>
-                <Input
-                  id="name"
-                  name="name"
-                  value={newItem.name}
-                  onChange={handleInputChange}
-                  placeholder="Enter item name"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="price">Price</Label>
-                <Input
-                  id="price"
-                  name="price"
-                  type="number"
-                  step="0.01"
-                  value={newItem.price}
-                  onChange={handleInputChange}
-                  placeholder="Enter price"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="quantity">Quantity</Label>
-                <Input
-                  id="quantity"
-                  name="quantity"
-                  type="number"
-                  value={newItem.quantity}
-                  onChange={handleInputChange}
-                  placeholder="Enter quantity"
-                  required
-                />
-              </div>
-            </div>
-            <Button type="submit" className="w-full">
-              <Plus className="mr-2 h-4 w-4" /> Add Item
-            </Button>
-          </form>
+          <StoreItemForm />
         </CardContent>
       </Card>
 
@@ -121,23 +54,24 @@ export default function InventoryPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {inventory.map((item) => (
-                <TableRow key={item.id}>
-                  <TableCell>{item.name}</TableCell>
-                  <TableCell>${item.price.toFixed(2)}</TableCell>
-                  <TableCell>{item.quantity}</TableCell>
-                  <TableCell>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => handleDelete(item.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                      <span className="sr-only">Delete item</span>
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
+              {inventory &&
+                inventory.map(
+                  (item: {
+                    id: string;
+                    name: string;
+                    price: number;
+                    quantity: number;
+                  }) => (
+                    <TableRow key={item.id}>
+                      <TableCell>{item.name}</TableCell>
+                      <TableCell>${item.price.toFixed(2)}</TableCell>
+                      <TableCell>{item.quantity}</TableCell>
+                      <TableCell>
+                        <DeleteItemButton itemId={Number(item.id)} />
+                      </TableCell>
+                    </TableRow>
+                  ),
+                )}
             </TableBody>
           </Table>
         </CardContent>

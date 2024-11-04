@@ -76,3 +76,14 @@ export function deleteSession() {
   cookies().delete('session');
   redirect('/login');
 }
+
+export function saveToSession(id: string) {
+  const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+  cookies().set('store', id, {
+    httpOnly: true,
+    secure: true,
+    expires: expires,
+    sameSite: 'lax',
+    path: '/',
+  });
+}
