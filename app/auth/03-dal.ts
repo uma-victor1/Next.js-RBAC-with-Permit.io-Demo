@@ -4,10 +4,11 @@ import { eq } from 'drizzle-orm';
 import { cache } from 'react';
 import { users } from '@/drizzle/schema';
 import { verifySession } from '@/app/auth/02-stateless-session';
-import { saveToSession } from '@/app/auth/02-stateless-session';
 
 export const getUser = cache(async () => {
   const session = await verifySession();
+  console.log(session);
+
   if (!session) return null;
 
   try {

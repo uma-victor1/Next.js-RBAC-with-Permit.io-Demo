@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button';
+import { cookies } from 'next/headers';
 import StoreItemForm from './StoreItemForm';
 import {
   Table,
@@ -10,21 +10,32 @@ import {
 } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import DeleteItemButton from './DeleteItemButton';
+import { type ProductWithStore } from './definitions';
 
 async function fetchInventory() {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/api/getStoreItems`,
-    { cache: 'no-store' },
-  );
-  if (!res.ok) throw new Error('Failed to fetch inventory');
+  const session = cookies().get('session')?.value;
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/getStoreItems`,
+      {
+        cache: 'no-store',
+        credentials: 'include',
+        headers: {
+          Authorization: `Bearer ${session}`,
+        },
+      },
+    );
 
-  return res.json();
+    if (!res.ok) throw new Error('Failed to fetch inventory');
+
+    return res.json();
+  } catch (error) {
+    throw new Error('Failed to fetch inventory' + error);
+  }
 }
 
 export default async function InventoryPage() {
-  const inventory = await fetchInventory();
-  console.log(inventory, 'inventory');
-  console.log('gcdgcjud');
+  const inventory: ProductWithStore[] = await fetchInventory();
 
   return (
     <div className="container mx-auto p-4">
@@ -54,24 +65,18 @@ export default async function InventoryPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
+              {!inventory && <p>No inventory found</p>}
               {inventory &&
-                inventory.map(
-                  (item: {
-                    id: string;
-                    name: string;
-                    price: number;
-                    quantity: number;
-                  }) => (
-                    <TableRow key={item.id}>
-                      <TableCell>{item.name}</TableCell>
-                      <TableCell>${item.price.toFixed(2)}</TableCell>
-                      <TableCell>{item.quantity}</TableCell>
-                      <TableCell>
-                        <DeleteItemButton itemId={Number(item.id)} />
-                      </TableCell>
-                    </TableRow>
-                  ),
-                )}
+                inventory.map((item) => (
+                  <TableRow key={item.products.id}>
+                    <TableCell>{item.products.name}</TableCell>
+                    <TableCell>${item.products.price.toFixed(2)}</TableCell>
+                    <TableCell>{item.products.quantity}</TableCell>
+                    <TableCell>
+                      <DeleteItemButton itemId={Number(item.products.id)} />
+                    </TableCell>
+                  </TableRow>
+                ))}
             </TableBody>
           </Table>
         </CardContent>

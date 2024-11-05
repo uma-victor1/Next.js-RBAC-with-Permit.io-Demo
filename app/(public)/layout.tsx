@@ -94,7 +94,7 @@ async function AuthButton() {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <Link href="/dashboard" className="flex items-center">
+                <Link href="/dashboard/products" className="flex items-center">
                   <LayoutDashboard className="mr-2 h-4 w-4" />
                   <span>Dashboard</span>
                 </Link>
