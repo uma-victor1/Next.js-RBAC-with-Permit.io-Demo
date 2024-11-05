@@ -22,7 +22,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/app/hooks/use-toast';
 
-export const formSchema = z.object({
+const formSchema = z.object({
   storeName: z.string().min(2, {
     message: 'Store name must be at least 2 characters.',
   }),
