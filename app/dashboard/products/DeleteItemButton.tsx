@@ -8,9 +8,14 @@ export default function DeleteItemButton({ itemId }: { itemId: number }) {
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
-    setIsDeleting(true);
-    await deleteItem(itemId);
-    setIsDeleting(false);
+    try {
+      setIsDeleting(true);
+      await deleteItem(itemId);
+    } catch (error) {
+      alert(error);
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   return (

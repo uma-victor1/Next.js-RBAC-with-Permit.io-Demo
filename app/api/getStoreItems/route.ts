@@ -10,7 +10,6 @@ import { Query } from 'pg';
 export async function GET(req: NextRequest, res: NextResponse) {
   const cookie = req.headers.get('authorization')?.split(' ')[1];
   const session = await decrypt(cookie);
-  console.log(session);
 
   if (!session?.userId) {
     return NextResponse.json({ error: 'Not logged in' }, { status: 401 });

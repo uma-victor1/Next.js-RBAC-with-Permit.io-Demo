@@ -37,3 +37,9 @@ export type SessionPayload = {
   userId: string | number;
   expiresAt: Date;
 };
+
+export type User = {
+  id: number;
+  name: string;
+  email: string;
+};

@@ -12,7 +12,7 @@ export default function Page() {
       </div>
       <div className="mt-6 text-center text-sm">
         Already have an account?{' '}
-        <Link className="underline" href="/login">
+        <Link prefetch={true} className="underline" href="/login">
           Login
         </Link>
       </div>

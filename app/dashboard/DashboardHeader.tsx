@@ -9,6 +9,7 @@ export default function DashboardHeader() {
   return (
     <header className="flex h-14 items-center border-b px-4 md:gap-4">
       <Link
+        prefetch={true}
         className="flex items-center rounded-md bg-gray-100 px-2 py-2 lg:hidden"
         href="#"
       >

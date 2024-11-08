@@ -15,7 +15,7 @@ export default function Page() {
       </div>
       <div className="mt-4 text-center text-sm">
         Don&apos;t have an account?{' '}
-        <Link className="underline" href="/signup">
+        <Link prefetch={true} className="underline" href="/signup">
           Sign up
         </Link>
       </div>

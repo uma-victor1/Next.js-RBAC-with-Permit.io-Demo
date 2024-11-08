@@ -35,6 +35,7 @@ export default function Layout({
             <nav className="ml-auto flex gap-4 sm:gap-6">
               {links.map((link) => (
                 <Link
+                  prefetch={true}
                   className="text-sm font-medium transition-colors hover:text-gray-900"
                   href={link.href}
                   key={link.title}

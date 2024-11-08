@@ -4,8 +4,17 @@ import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import { checkPermission } from '@/lib/permit';
+import { redirect } from 'next/navigation';
 
-export default function Home() {
+export default async function Home() {
+  const permitted = await checkPermission('read', 'Storefront');
+  console.log(permitted, 'permitted');
+
+  if (!permitted) {
+    redirect('/dashboard/products');
+  }
+
   const featuredItems = [
     {
       name: 'Wireless Earbuds',
@@ -140,12 +149,14 @@ export default function Home() {
                 </p>
                 <div className="flex flex-col gap-2 min-[400px]:flex-row">
                   <Link
+                    prefetch={true}
                     className="rounded-md border px-4 py-1.5 text-sm font-medium transition-colors hover:border-white hover:bg-white hover:text-black"
                     href="/login"
                   >
                     Login
                   </Link>
                   <Link
+                    prefetch={true}
                     className="rounded-md border px-4 py-1.5 text-sm font-medium transition-colors hover:border-black hover:bg-black hover:text-white"
                     href="/signup"
                   >

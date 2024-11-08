@@ -1,18 +1,25 @@
 'use server';
-
 import { db } from '@/drizzle/db';
 import { products, stores } from '@/drizzle/schema';
 import { eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { getUser } from '../auth/03-dal';
+import { type User } from '../auth/definitions';
+import { checkPermission } from '@/lib/permit';
 
 export const deleteItem = async (itemId: number) => {
   try {
     await checkAccess(itemId);
+    const permitted = await checkPermission('delete', 'Product');
+
+    if (!permitted) {
+      throw new Error('You do not have permission to delete this item');
+    }
+
     await db.delete(products).where(eq(products.id, itemId));
     revalidatePath('/dashboard/products');
   } catch (error) {
-    throw new Error('Couln not delete item');
+    throw new Error('Error: ' + error);
   }
 };
 

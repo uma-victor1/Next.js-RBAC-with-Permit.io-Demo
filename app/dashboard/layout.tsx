@@ -1,15 +1,22 @@
 import DashboardHeader from './DashboardHeader';
-import { getUser } from '@/app/auth/03-dal';
+
 import { Toaster } from '@/components/ui/toaster';
 
 import SideBar from './sidebar';
+import { checkPermission } from '@/lib/permit';
+import { redirect } from 'next/navigation';
 
 export default async function Layout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const user = await getUser();
+  const permitted = await checkPermission('read', 'Dashboard');
+  console.log(permitted, 'permitted');
+
+  if (!permitted) {
+    redirect('/');
+  }
 
   return (
     <div className="flex min-h-screen w-full">

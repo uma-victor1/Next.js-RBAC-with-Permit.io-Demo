@@ -18,6 +18,7 @@ export default function DashboardNav() {
     <div>
       {navLinks.map((link) => (
         <Link
+          prefetch={true}
           className={`${
             pathname === link.href
               ? 'active bg-gray-100 text-gray-900 hover:text-gray-900'
