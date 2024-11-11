@@ -11,6 +11,10 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import DeleteItemButton from './DeleteItemButton';
 import { type ProductWithStore } from './definitions';
+import AddManagerForm from './AddManagerForm';
+import { db } from '@/drizzle/db';
+import { storeAccess, users } from '@/drizzle/schema';
+import { eq } from 'drizzle-orm';
 
 async function fetchInventory() {
   const session = cookies().get('session')?.value;
@@ -40,6 +44,15 @@ export default async function InventoryPage() {
   return (
     <div className="container mx-auto p-4">
       <h1 className="mb-4 text-2xl font-bold">Store Inventory</h1>
+
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle>Add Manager</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <AddManagerForm />
+        </CardContent>
+      </Card>
 
       <Card className="mb-8">
         <CardHeader>

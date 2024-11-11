@@ -29,10 +29,21 @@ export const stores = pgTable('stores', {
   id: serial('id').primaryKey(),
   name: varchar('name', { length: 255 }).notNull(),
   description: text('description').notNull(),
-  ownerId: integer('owner_id')
-    .notNull()
-    .references(() => users.id), // Store owner
+
   createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+// StoreAccess Table for Managing Roles in Stores
+export const storeAccess = pgTable('store_access', {
+  id: serial('id').primaryKey(),
+  storeId: integer('store_id')
+    .notNull()
+    .references(() => stores.id),
+  userId: integer('user_id')
+    .notNull()
+    .references(() => users.id),
+  role: varchar('role', { length: 50 }).notNull(),
+  assignedAt: timestamp('assigned_at').defaultNow().notNull(),
 });
 
 // Products Table
@@ -85,3 +96,4 @@ export type Store = InferInsertModel<typeof stores>;
 export type Product = InferInsertModel<typeof products>;
 export type CartItem = InferInsertModel<typeof cartItems>;
 export type Order = InferInsertModel<typeof orders>;
+export type StoreAccess = InferInsertModel<typeof storeAccess>;

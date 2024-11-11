@@ -4,8 +4,13 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Input } from '@/components/ui/input';
 import React from 'react';
+import { getUser } from '../auth/03-dal';
 
-export default function DashboardHeader() {
+export default async function DashboardHeader() {
+  const user = await getUser();
+  if (!user) {
+    throw new Error('user not found');
+  }
   return (
     <header className="flex h-14 items-center border-b px-4 md:gap-4">
       <Link
@@ -16,7 +21,7 @@ export default function DashboardHeader() {
         <PackageIcon className="h-6 w-6" />
         <span className="sr-only">Home</span>
       </Link>
-      <h1 className="md:blobk hidden text-lg font-semibold">Dashboard</h1>
+      <h1 className="hidden text-lg font-semibold md:block">Dashboard</h1>
       <div className="ml-auto flex items-center gap-4">
         <form>
           <div className="relative">
@@ -27,6 +32,7 @@ export default function DashboardHeader() {
             />
           </div>
         </form>
+        {user.email}
         <Button className="rounded-full" size="icon" variant="ghost">
           <Image
             alt="Avatar"

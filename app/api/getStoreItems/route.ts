@@ -1,11 +1,9 @@
 import { db } from '@/drizzle/db';
-import { products, stores } from '@/drizzle/schema';
-
+import { products, stores, storeAccess } from '@/drizzle/schema';
 import { NextRequest, NextResponse } from 'next/server';
 import { getUser } from '@/app/auth/03-dal';
-import { eq } from 'drizzle-orm';
+import { eq, or, and } from 'drizzle-orm';
 import { decrypt } from '@/app/auth/02-stateless-session';
-import { Query } from 'pg';
 
 export async function GET(req: NextRequest, res: NextResponse) {
   const cookie = req.headers.get('authorization')?.split(' ')[1];
@@ -17,13 +15,19 @@ export async function GET(req: NextRequest, res: NextResponse) {
   const userId = session.userId;
 
   try {
-    // Query to retrieve products that belong to stores owned by the user
+    // Query to retrieve products for stores where the user is either an Admin or Manager
     const storeItems = await db
       .select()
       .from(products)
       .innerJoin(stores, eq(products.storeId, stores.id))
-      //@ts-ignore
-      .where(eq(stores.ownerId, userId)); // Ensure the store owner matches the current user
+      .innerJoin(storeAccess, eq(stores.id, storeAccess.storeId))
+      .where(
+        and(
+          //@ts-ignore
+          eq(storeAccess.userId, userId),
+          or(eq(storeAccess.role, 'admin'), eq(storeAccess.role, 'manager')), // Admin or Manager role
+        ),
+      );
 
     return NextResponse.json(storeItems, { status: 200 });
   } catch (error) {
