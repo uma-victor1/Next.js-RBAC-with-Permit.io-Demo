@@ -8,13 +8,6 @@ import { checkPermission } from '@/lib/permit';
 import { redirect } from 'next/navigation';
 
 export default async function Home() {
-  const permitted = await checkPermission('read', 'Storefront');
-  console.log(permitted, 'permittedStorefront');
-
-  if (!permitted) {
-    redirect('/dashboard/products');
-  }
-
   const featuredItems = [
     {
       name: 'Wireless Earbuds',
