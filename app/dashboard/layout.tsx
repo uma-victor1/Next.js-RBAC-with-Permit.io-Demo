@@ -6,6 +6,7 @@ import SideBar from './sidebar';
 import { checkPermission } from '@/lib/permit';
 import { redirect } from 'next/navigation';
 
+export const dynamic = 'force-dynamic';
 export default async function Layout({
   children,
 }: {

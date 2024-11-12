@@ -3,6 +3,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { checkPermission } from '@/lib/permit';
 import { redirect } from 'next/navigation';
 
+export const dynamic = 'force-dynamic';
 async function Layout({ children }: { children: React.ReactNode }) {
   const permitted = await checkPermission('create', 'Store');
   console.log(permitted, 'permitted');
