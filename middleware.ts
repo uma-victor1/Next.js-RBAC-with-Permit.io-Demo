@@ -9,7 +9,6 @@ const publicRoutes = ['/login', '/signup', '/'];
 export default async function middleware(req: NextRequest) {
   // 2. Check if the current route is protected or public
   const path = req.nextUrl.pathname;
-  const isAuth = path == '/login' || path == '/signup';
 
   const isProtectedRoute = protectedRoutes.includes(path);
   const isPublicRoute = publicRoutes.includes(path);
@@ -19,13 +18,9 @@ export default async function middleware(req: NextRequest) {
   const session = await decrypt(cookie);
 
   // 4. Redirect
-  if (isProtectedRoute && !session?.userId) {
-    return NextResponse.redirect(new URL('/login', req.nextUrl));
-  }
-
-  if (isPublicRoute && session?.userId && isAuth) {
-    return NextResponse.redirect(new URL('/', req.nextUrl));
-  }
+  // if (!session?.userId) {
+  //   return NextResponse.redirect(new URL('/login', req.nextUrl));
+  // }
 
   return NextResponse.next();
 }

@@ -7,6 +7,7 @@ import { getUser } from '../auth/03-dal';
 import * as z from 'zod';
 import permit from '@/lib/permit';
 import { RoleAssignmentCreate } from 'permitio';
+import { UserRole } from '../auth/definitions';
 
 type formSchema = {
   storeName: string;
@@ -24,7 +25,7 @@ export const createStoreAction = async (s: formSchema) => {
     description: s.description,
   };
   try {
-    const assignedRole = {
+    const assignedRole: UserRole = {
       role: 'admin',
       tenant: 'default',
       user: user.id.toString(),

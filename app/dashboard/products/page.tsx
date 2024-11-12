@@ -15,6 +15,7 @@ import AddManagerForm from './AddManagerForm';
 import { db } from '@/drizzle/db';
 import { storeAccess, users } from '@/drizzle/schema';
 import { eq } from 'drizzle-orm';
+import { checkPermission } from '@/lib/permit';
 
 async function fetchInventory() {
   const session = cookies().get('session')?.value;
@@ -34,25 +35,28 @@ async function fetchInventory() {
 
     return res.json();
   } catch (error) {
-    throw new Error('Failed to fetch inventory' + error);
+    throw new Error(error as string);
   }
 }
 
 export default async function InventoryPage() {
   const inventory: ProductWithStore[] = await fetchInventory();
 
+  const permitted = await checkPermission('create', 'Product');
+
   return (
     <div className="container mx-auto p-4">
       <h1 className="mb-4 text-2xl font-bold">Store Inventory</h1>
-
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle>Add Manager</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <AddManagerForm />
-        </CardContent>
-      </Card>
+      {permitted && (
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle>Add Manager</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <AddManagerForm />
+          </CardContent>
+        </Card>
+      )}
 
       <Card className="mb-8">
         <CardHeader>

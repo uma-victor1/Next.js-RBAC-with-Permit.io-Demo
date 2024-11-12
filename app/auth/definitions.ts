@@ -43,3 +43,18 @@ export type User = {
   name: string;
   email: string;
 };
+export type Role = 'customer' | 'admin' | 'manager';
+export type Tenant = 'default';
+export type UserRole = {
+  role: Role;
+  tenant: Tenant;
+  user: string;
+};
+
+export type PermitUser = {
+  key: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  attributes: Record<string, unknown>;
+};

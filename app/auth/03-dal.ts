@@ -7,7 +7,6 @@ import { verifySession } from '@/app/auth/02-stateless-session';
 
 export const getUser = cache(async () => {
   const session = await verifySession();
-  console.log(session);
 
   if (!session) return null;
 
@@ -27,7 +26,6 @@ export const getUser = cache(async () => {
 
     return user;
   } catch (error) {
-    console.log('Failed to fetch user');
-    return null;
+    throw new Error('Failed to fetch user');
   }
 });

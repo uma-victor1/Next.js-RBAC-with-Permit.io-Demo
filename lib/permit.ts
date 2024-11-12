@@ -1,7 +1,7 @@
 import { getUser } from '@/app/auth/03-dal';
 import { User } from '@/app/auth/definitions';
 import { Permit } from 'permitio';
-
+import { unstable_cache } from 'next/cache';
 // This line initializes the SDK and connects your app
 // to the Permit.io Cloud PDP.
 
@@ -11,18 +11,39 @@ const permit = new Permit({
   token: process.env.PERMIT_IO_API_KEY,
 });
 
-type Actions = 'create' | 'read' | 'update' | 'delete';
-type Resources = 'Product' | 'Store' | 'Analytics' | 'Storefront' | 'Dashboard';
+const TEN_MINUTES = 60 * 10;
 
-export async function checkPermission(action: Actions, resource: Resources) {
-  const user: User | null = await getUser();
-  if (!user) {
-    throw new Error('No user found');
+export type Actions = 'create' | 'read' | 'update' | 'delete';
+export type Resources =
+  | 'Product'
+  | 'Store'
+  | 'Analytics'
+  | 'Storefront'
+  | 'Dashboard';
+
+const check = unstable_cache(
+  async (action: Actions, resource: Resources, id: string) => {
+    const permitted = await permit.check(id, action, resource);
+    console.log(permitted, 'permitted');
+    return permitted;
+  },
+  ['permitKey'],
+  { revalidate: TEN_MINUTES },
+);
+
+export const checkPermission = async (action: Actions, resource: Resources) => {
+  try {
+    const user = await getUser();
+    if (!user) {
+      throw new Error('No user found');
+    }
+    const hasPermission = await check(action, resource, user.id.toString());
+    return hasPermission;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    }
   }
-  const permitted = await permit.check(user.id.toString(), action, resource);
-  console.log(permitted, 'permitted');
-
-  return permitted;
-}
+};
 
 export default permit;

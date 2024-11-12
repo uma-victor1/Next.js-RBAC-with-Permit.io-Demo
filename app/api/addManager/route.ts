@@ -7,6 +7,7 @@ import { decrypt } from '@/app/auth/02-stateless-session';
 import permit from '@/lib/permit';
 import { getUserStore } from '@/app/services/addItem';
 import { RoleAssignmentCreate } from 'permitio';
+import { UserRole } from '@/app/auth/definitions';
 
 export async function POST(req: NextRequest, res: NextResponse) {
   const user = await getUser();
@@ -16,17 +17,17 @@ export async function POST(req: NextRequest, res: NextResponse) {
   }
 
   const adminUserId = user.id;
-  console.log(adminUserId);
 
   const { email: managerEmail } = await req.json();
-  console.log(managerEmail);
+
   // Email of the user to be added as manager
 
   const store = await getUserStore();
-  if (!store || store.length === 0) return; // Ensure the user has at least one store with Admin access
+  if (!store || store.length === 0) {
+    return NextResponse.json({ message: 'No store found' }, { status: 404 });
+  } // Ensure the user has at least one store with Admin access
 
   const storeId = store[0].stores.id;
-  console.log(storeId, 'storeId');
 
   // Verify if the requester is an Admin for this store
   const isAdmin = await db
@@ -52,7 +53,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
   if (!manager) {
     return NextResponse.json({ message: 'User not found' }, { status: 404 });
   }
-  console.log(manager[0].id, 'managerId');
 
   // Check if the user is already a manager
   const existingAccess = await db
@@ -65,7 +65,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
         eq(storeAccess.role, 'manager'),
       ),
     );
-  console.log(existingAccess, 'existingAccess');
 
   if (existingAccess.length > 0) {
     return NextResponse.json(
@@ -80,14 +79,22 @@ export async function POST(req: NextRequest, res: NextResponse) {
     userId: manager[0].id,
     role: 'manager',
   });
-
-  const assignedRole = {
+  const unassignRole: UserRole = {
+    role: 'customer',
+    tenant: 'default',
+    user: manager[0].id.toString(),
+  };
+  const assignedRole: UserRole = {
     role: 'manager',
     tenant: 'default',
     user: manager[0].id.toString(),
   };
 
-  // Assign the Manager role in Permit.io
+  // remove and assign the Manager role in Permit.io
+  await permit.api.unassignRole(
+    JSON.stringify(unassignRole) as unknown as RoleAssignmentCreate,
+  );
+
   await permit.api.assignRole(
     JSON.stringify(assignedRole) as unknown as RoleAssignmentCreate,
   );

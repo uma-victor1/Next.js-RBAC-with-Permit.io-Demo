@@ -49,7 +49,7 @@ export default function CreateStore() {
         title: 'Store created successfully!',
         description: 'Your new store has been set up.',
       });
-      router.push('/dashboard'); // Redirect to dashboard after creation
+      router.push('/dashboard/products'); // Redirect to dashboard after creation
     } catch (error) {
       console.error('Error creating store:', error);
       toast({

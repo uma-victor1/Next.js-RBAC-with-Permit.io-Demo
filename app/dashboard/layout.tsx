@@ -12,7 +12,7 @@ export default async function Layout({
   children: React.ReactNode;
 }) {
   const permitted = await checkPermission('read', 'Dashboard');
-  console.log(permitted, 'permitted');
+  console.log(permitted, 'permitteddashboard');
 
   if (!permitted) {
     redirect('/');

@@ -10,6 +10,9 @@ import {
 import { createSession, deleteSession } from '@/app/auth/02-stateless-session';
 import bcrypt from 'bcrypt';
 import { eq } from 'drizzle-orm';
+import permit from '@/lib/permit';
+import { RoleAssignmentCreate } from 'permitio';
+import { UserRole, PermitUser } from '@/app/auth/definitions';
 
 export async function signup(
   state: FormState,
@@ -54,18 +57,36 @@ export async function signup(
       email,
       password: hashedPassword,
     })
-    .returning({ id: users.id });
+    .returning({ id: users.id, email: users.email, name: users.name });
 
   const user = data[0];
-
   if (!user) {
     return {
       message: 'An error occurred while creating your account.',
     };
   }
+  const userId = user.id.toString();
+
+  const newPermitUser: PermitUser = {
+    key: user.id.toString(),
+    email: user.email,
+    first_name: user.name,
+    last_name: '',
+    attributes: {},
+  };
+
+  const assignedRole: UserRole = {
+    role: 'customer',
+    tenant: 'default',
+    user: userId,
+  };
+  // Create and sync new user with permit.io
+  permit.api.createUser(newPermitUser);
+  permit.api.assignRole(
+    JSON.stringify(assignedRole) as unknown as RoleAssignmentCreate,
+  );
 
   // 4. Create a session for the user
-  const userId = user.id.toString();
   await createSession(userId);
 }
 

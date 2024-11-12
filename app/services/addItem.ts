@@ -25,6 +25,7 @@ export const getUserStore = async () => {
         eq(storeAccess.role, 'admin'), // Only Admins can add products
       ),
     );
+  console.log(userStores, 'userStores');
 
   return userStores;
 };
@@ -35,7 +36,11 @@ export const addItem = async (
   try {
     const { name, description, price, quantity } = formData;
     const store = await getUserStore();
-    if (!store || store.length === 0) return; // Ensure the user has at least one store with Admin access
+    if (!store || store.length === 0) {
+      throw new Error(
+        'You must have at least one store with Admin or manager access',
+      );
+    } // Ensure the user has at least one store with Admin access
 
     const storeId = store[0].stores.id;
 
